@@ -1,0 +1,6 @@
+[package]
+name = "meier_sdk_rust"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
