@@ -1,3 +1,4 @@
 /target
 .meier
 .DS_Store
+crates/*/tests
