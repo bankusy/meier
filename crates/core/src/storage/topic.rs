@@ -1,5 +1,4 @@
 use std::{collections::HashMap, sync::Arc};
-
 use tokio::sync::RwLock;
 
 use crate::{
@@ -37,7 +36,7 @@ impl Topic {
         &self.name
     }
 
-    pub async fn add_message(&mut self, msg: Message) -> Result<()> {
+    pub async fn add_message(&self, msg: Message) -> Result<()> {
         let partition = self.next_partition().await;
         partition.add_message(msg).await
     }
@@ -86,15 +85,15 @@ impl TopicManager {
         let mut topics = self.topics.write().await;
 
         if topics.len() >= self.max_topics {
-            return Err(crate::MeierError::Storage(format!(
+            return Err(MeierError::Storage(format!(
                 "Maximum topics limit reached: {}",
                 self.max_topics
             )));
         }
 
         if topics.contains_key(&name) {
-            return Err(crate::MeierError::Storage(format!(
-                "Topic alread exists: {}",
+            return Err(MeierError::Storage(format!(
+                "Topic already exists: {}",
                 name
             )));
         }

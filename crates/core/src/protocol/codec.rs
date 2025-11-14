@@ -1,7 +1,8 @@
 use bytes::{Buf, BufMut, BytesMut};
 use tokio_util::codec::{Decoder, Encoder};
 
-use crate::{MeierError, Result, protocol::Frame};
+use crate::protocol::Frame;
+use crate::{MeierError, Result};
 
 /// 프로토콜 코덱
 ///
@@ -43,7 +44,7 @@ impl Decoder for MeierCodec {
         let length = u32::from_be_bytes([src[0], src[1], src[2], src[3]]) as usize;
 
         if length > self.max_frame_length {
-            return Err(crate::MeierError::Protocol(format!(
+            return Err(MeierError::Protocol(format!(
                 "Frame too large: {}, bytes (max: {})",
                 length, self.max_frame_length
             )));
@@ -77,7 +78,7 @@ impl Encoder<Frame> for MeierCodec {
         let length = data.len();
 
         if length > self.max_frame_length {
-            return Err(crate::MeierError::Protocol(format!(
+            return Err(MeierError::Protocol(format!(
                 "Frame too large: {} bytes (max: {})",
                 length, self.max_frame_length
             )));

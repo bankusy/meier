@@ -1,3 +1,5 @@
+use crate::MeierError;
+
 #[derive(Debug, Clone)]
 pub struct Message {
     pub data: Vec<u8>,
@@ -22,6 +24,6 @@ impl Message {
 
     pub fn to_string(&self) -> crate::Result<String> {
         String::from_utf8(self.data.clone())
-            .map_err(|e| crate::MeierError::Protocol(format!("Invalid UTF-8: {}", e)))
+            .map_err(|e| MeierError::Protocol(format!("Invalid UTF-8: {}", e)))
     }
 }
