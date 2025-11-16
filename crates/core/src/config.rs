@@ -24,9 +24,9 @@ pub struct StorageConfig {
     #[serde(default = "default_max_messages")]
     pub max_messages_per_partition: usize,
     #[serde(default = "default_max_size")]
-    pub max_messages_size_byte: usize,
+    pub max_message_size_byte: usize,
     #[serde(default = "default_max_topics")]
-    pub max_messages_topics: usize,
+    pub max_topics: usize,
 }
 
 fn default_max_messages() -> usize {
@@ -72,8 +72,8 @@ impl Config {
             },
             storage: StorageConfig {
                 max_messages_per_partition: 10000,
-                max_messages_size_byte: 1024 * 1024,
-                max_messages_topics: 100,
+                max_message_size_byte: 1024 * 1024,
+                max_topics: 100,
             },
             logging: LoggingConfig {
                 level: LogLevel::INFO,
@@ -91,7 +91,7 @@ impl Config {
             .add_source(config::File::with_name(path.as_ref().to_str().unwrap()))
             .add_source(config::Environment::with_prefix("MEIER"))
             .build()
-            .map_err(|e| crate::error::MeierError::Config((e.to_string())))?;
+            .map_err(|e| crate::error::MeierError::Config(e.to_string()))?;
 
         settings
             .try_deserialize()

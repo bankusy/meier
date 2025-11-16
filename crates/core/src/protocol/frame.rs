@@ -1,9 +1,7 @@
+use crate::{MeierError, Result};
 use serde::{Deserialize, Serialize};
 
-use crate::{MeierError, Result};
-
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-
 pub enum Frame {
     Produce {
         topic: String,
@@ -44,6 +42,42 @@ impl Frame {
 
     pub fn size(&self) -> Result<usize> {
         Ok(self.to_bytes()?.len())
+    }
+
+    pub fn produce(topic: String, message: Vec<u8>) -> Self {
+        Self::Produce { topic, message }
+    }
+
+    pub fn consume(topic: String, partition_id: usize, offset: usize) -> Self {
+        Self::Consume {
+            topic,
+            partition_id,
+            offset,
+        }
+    }
+
+    pub fn response_ok(data: Option<Vec<u8>>) -> Self {
+        Self::Response {
+            status: Status::ok(),
+            data,
+            message: None,
+        }
+    }
+
+    pub fn response_error(message: String) -> Self {
+        Self::Response {
+            status: Status::Error(message.clone()),
+            data: None,
+            message: Some(message),
+        }
+    }
+
+    pub fn response_ok_str(message: String) -> Self {
+        Self::Response {
+            status: Status::ok(),
+            data: Some(message.into_bytes()),
+            message: None,
+        }
     }
 }
 
