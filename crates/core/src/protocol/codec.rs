@@ -8,6 +8,7 @@ use crate::{MeierError, Result};
 ///
 /// 프레임 형식
 /// [길이: 4바이트(u32, big-endian)][데이터: JSON]
+#[derive(Clone)]
 pub struct MeierCodec {
     pub max_frame_length: usize,
 }

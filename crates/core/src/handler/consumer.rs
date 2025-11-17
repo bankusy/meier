@@ -14,7 +14,7 @@ pub async fn handle_consume(
     let partition = topic
         .get_partition(&partition_id.to_string())
         .ok_or_else(|| {
-            MeierError::ParitionNotFound(format!(
+            MeierError::PartitionNotFound(format!(
                 "Partition {} not found in topic {}",
                 partition_id,
                 topic.name()
@@ -57,7 +57,7 @@ pub async fn handle_consume_next(
     let partition = topic
         .get_partition(&partition_id.to_string())
         .ok_or_else(|| {
-            MeierError::ParitionNotFound(format!(
+            MeierError::PartitionNotFound(format!(
                 "Partition {} not found in topic {}",
                 partition_id,
                 topic.name()

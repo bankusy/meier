@@ -21,7 +21,7 @@ pub enum MeierError {
     TopicNotFound(String),
 
     #[error("Partition not found: {0}")]
-    ParitionNotFound(String),
+    PartitionNotFound(String),
 }
 
 pub type Result<T> = std::result::Result<T, MeierError>;

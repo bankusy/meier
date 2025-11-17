@@ -10,7 +10,7 @@ pub struct Config {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServerConfig {
-    pub bind_arr: String,
+    pub bind_addr: String,
     #[serde(default = "default_max_connections")]
     pub max_connections: usize,
 }
@@ -24,7 +24,7 @@ pub struct StorageConfig {
     #[serde(default = "default_max_messages")]
     pub max_messages_per_partition: usize,
     #[serde(default = "default_max_size")]
-    pub max_message_size_byte: usize,
+    pub max_message_size_bytes: usize,
     #[serde(default = "default_max_topics")]
     pub max_topics: usize,
 }
@@ -67,12 +67,12 @@ impl Config {
     pub fn default() -> Self {
         Self {
             server: ServerConfig {
-                bind_arr: "127.0.0.1:2369".to_string(),
+                bind_addr: "127.0.0.1:2369".to_string(),
                 max_connections: 1000,
             },
             storage: StorageConfig {
                 max_messages_per_partition: 10000,
-                max_message_size_byte: 1024 * 1024,
+                max_message_size_bytes: 1024 * 1024,
                 max_topics: 100,
             },
             logging: LoggingConfig {
