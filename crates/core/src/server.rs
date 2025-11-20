@@ -6,7 +6,7 @@ use tracing::{error, info};
 
 use crate::{
     Config, Frame, MeierCodec, MeierError, Result,
-    handler::{handle_consume, handle_produce},
+    handler::{handle_consume, handle_consume_next, handle_produce},
     protocol,
     storage::TopicManager,
 };
@@ -111,6 +111,17 @@ impl Server {
                 partition_id,
                 offset,
             } => match handle_consume(topic_manager, topic, partition_id, offset).await {
+                Ok(response) => response,
+                Err(e) => Frame::Response {
+                    status: protocol::Status::error(e.to_string()),
+                    data: None,
+                    message: Some(e.to_string()),
+                },
+            },
+            Frame::ConsumeNext {
+                topic,
+                partition_id,
+            } => match handle_consume_next(topic_manager, topic, partition_id).await {
                 Ok(response) => response,
                 Err(e) => Frame::Response {
                     status: protocol::Status::error(e.to_string()),
