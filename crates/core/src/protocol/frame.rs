@@ -12,6 +12,10 @@ pub enum Frame {
         partition_id: usize,
         offset: usize,
     },
+    ConsumeNext {
+        topic: String,
+        partition_id: usize,
+    },
     Response {
         status: Status,
         data: Option<Vec<u8>>,
