@@ -1,5 +1,11 @@
+use futures::TryFutureExt;
 use serde::{Deserialize, Serialize};
-use std::path::Path;
+use std::{
+    env, fs,
+    path::{Path, PathBuf},
+};
+
+use crate::{MeierError, Result};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
@@ -82,10 +88,55 @@ impl Config {
         }
     }
 
-    /*
-     * 1. 파일 추출 후 환경변수에도 동시 반영
-     * 2.
-     */
+    pub fn user_config_file() -> Result<PathBuf> {
+        let home = env::var("HOME")
+            .or_else(|_| env::var("USERPROFILE"))
+            .map_err(|_| MeierError::Config("Failed to get home directory".to_string()))?;
+
+        Ok(PathBuf::from(home)
+            .join(".config")
+            .join("meier")
+            .join("config.toml"))
+    }
+
+    // 설정 파일이 포함된 디렉토리 반환
+    pub fn user_config_dir() -> Result<PathBuf> {
+        Self::user_config_file().map(|path| path.parent().unwrap().to_path_buf())
+    }
+
+    pub fn load_user_config() -> Result<Self> {
+        let config_file = Self::user_config_file()?;
+        if !config_file.exists() {
+            return Err(MeierError::Config(format!(
+                "Config file not found: {}",
+                config_file.display(),
+            )));
+        }
+
+        Self::from_file(config_file)
+    }
+
+    pub fn save_user_config(&self) -> Result<()> {
+        let config_file = Self::user_config_file()?;
+        let config_dir = config_file.parent().unwrap();
+
+        fs::create_dir_all(config_dir)
+            .map_err(|e| MeierError::Config(format!("Failed to create config directory: {}", e)))?;
+
+        let toml_content = toml::to_string_pretty(self)
+            .map_err(|e| MeierError::Config(format!("Failed to serialize config: {}", e)))?;
+
+        fs::write(&config_file, toml_content)
+            .map_err(|e| MeierError::Config(format!("Failed to write config file: {}", e)))?;
+        Ok(())
+    }
+
+    pub fn user_config_exists() -> bool {
+        Self::user_config_file()
+            .map(|path| path.exists())
+            .unwrap_or(false)
+    }
+
     pub fn from_file<P: AsRef<Path>>(path: P) -> crate::error::Result<Self> {
         let settings = config::Config::builder()
             .add_source(config::File::with_name(path.as_ref().to_str().unwrap()))
